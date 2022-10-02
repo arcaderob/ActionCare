@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "ActionCare",
+    "slug": "ActionCare",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  },
+  "name": "ActionCare"
+}
