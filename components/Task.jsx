@@ -11,7 +11,7 @@ const Task = (props) => {
       </View>
       <View style={styles.circular}></View>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
