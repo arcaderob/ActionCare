@@ -1,7 +1,8 @@
 import { useNavigation } from '@react-navigation/core';
 import React, { useEffect, useState } from 'react';
 import { Alert, TouchableOpacity, TextInput, KeyboardAvoidingView, StyleSheet, Text, View } from 'react-native';
-import { auth } from '../firebase';
+import AlertAsync from "react-native-alert-async";
+import { auth, db } from '../firebase';
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('');
@@ -19,16 +20,21 @@ const LoginScreen = () => {
     return unsubscribe;
     }, []);
 
-  const handleSignUp = () => {
-    auth
+  const handleSignUp = async () => {
+    var accountType = await AlertAsync(
+      "Selection",
+      'Select your account type',
+      [
+        { text: "Patient", onPress: () => 'Patient' },
+        { text: "Subscriber", onPress: () => 'Subscriber' }
+      ],
+      { cancelable: false }
+    );
+    await auth
       .createUserWithEmailAndPassword(email, password)
       .then(userCredentials => {
+        db.collection('users').doc(userCredentials.user.uid).set({ accountType: accountType });
         const user = userCredentials.user;
-        Alert.alert(
-          "Success",
-          `Signed up as ${user.email}`,
-          [{ text: "OK", onPress: () => {} }]
-        );
         console.log(`Success: Signed up as ${user.email}`);
       })
       .catch(error => {

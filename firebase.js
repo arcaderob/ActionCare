@@ -17,10 +17,12 @@ let app;
 
 if (firebase.apps.length === 0) {
   app = firebase.initializeApp(firebaseConfig);
+  firebase.firestore().settings({ experimentalForceLongPolling: true, merge: true });
 } else {
-  app = firebase.app()
+  app = firebase.app();
 }
 
-const auth = firebase.auth()
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-export { auth };
+export { auth, db };
