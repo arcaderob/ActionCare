@@ -3,10 +3,14 @@ import React, { useState } from 'react';
 import { Alert, KeyboardAvoidingView, StyleSheet, Text, View, TextInput, TouchableOpacity, Keyboard, ScrollView } from 'react-native';
 import { auth } from '../firebase';
 import Task from '../components/Task';
+import axios from 'axios';
+import DatePicker from 'react-native-date-picker';
 
 const TaskScreen = () => {
   const [task, setTask] = useState();
   const [taskItems, setTaskItems] = useState([]);
+  const [date, setDate] = useState(new Date())
+  const [open, setOpen] = useState(false)
 
   const navigation = useNavigation()
 
@@ -26,11 +30,28 @@ const TaskScreen = () => {
       });
   }
 
-  const handleAddTask = () => {
+  const postTaskDataToBackEnd = (taskData) => {
+    axios.post('http://localhost:3001/task', {taskData})
+      .then(resp => {
+        console.log('succcess', resp);
+      })
+      .catch(e => {
+        console.error(e);
+      })
+  };
+
+  const handleSettingTaskData = () => {
     Keyboard.dismiss();
-    setTaskItems([...taskItems, task]);
-    setTask(null);
+    const taskData = [...taskItems, task];
+    setTaskItems(taskData);
+    setOpen(true);
   }
+
+  const sendTaskDataToBackend = () => {
+    const dataToSend = { task, date }
+    postTaskDataToBackEnd(dataToSend);
+    setTask(null);
+  };
 
   const completeTask = (index) => {
     let itemsCopy = [...taskItems];
@@ -84,13 +105,27 @@ const TaskScreen = () => {
         style={styles.writeTaskWrapper}
       >
         <TextInput style={styles.input} placeholder={'Write a task'} value={task} onChangeText={text => setTask(text)} />
-        <TouchableOpacity onPress={() => handleAddTask()}>
+        <TouchableOpacity onPress={() => {
+          handleSettingTaskData();
+        }}>
           <View style={styles.addWrapper}>
             <Text style={styles.addText}>+</Text>
           </View>
+          <DatePicker
+            modal
+            open={open}
+            date={date}
+            onConfirm={(date) => {
+              setDate(date);
+              setOpen(false);
+              sendTaskDataToBackend();
+            }}
+            onCancel={() => {
+              setOpen(false)
+            }}
+          />
         </TouchableOpacity>
       </KeyboardAvoidingView>
-
     </View>
   );
 }
