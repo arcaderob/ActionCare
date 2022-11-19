@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/core';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, KeyboardAvoidingView, StyleSheet, Text, View, TextInput, TouchableOpacity, Keyboard, ScrollView } from 'react-native';
 import { auth } from '../firebase';
 import Task from '../components/Task';
@@ -11,6 +11,14 @@ const TaskScreen = () => {
   const [taskItems, setTaskItems] = useState([]);
   const [date, setDate] = useState(new Date())
   const [open, setOpen] = useState(false)
+  const [daily, setDaily] = useState(false);
+  const [send, setSend] = useState(false);
+
+  useEffect(() => {
+    if (send) {
+      sendTaskDataToBackend();
+    }
+}, [send]);
 
   const navigation = useNavigation()
 
@@ -30,6 +38,27 @@ const TaskScreen = () => {
       });
   }
 
+  const createTwoButtonAlert = () =>
+    Alert.alert(
+      "Daily Alert",
+      "Repeat Daily?",
+      [
+        {
+          text: "No",
+          onPress: () => {
+            setDaily(false);
+            setSend(true);
+          },
+          style: "cancel"
+        },
+        { text: "Yes", onPress: () => {
+            setDaily(true);
+            setSend(true);
+          }
+        }
+      ]
+    );
+
   const postTaskDataToBackEnd = (taskData) => {
     axios.post('http://localhost:3001/task', {taskData})
       .then(resp => {
@@ -48,9 +77,12 @@ const TaskScreen = () => {
   }
 
   const sendTaskDataToBackend = () => {
-    const dataToSend = { task, date }
+    const dataToSend = { task, date, daily }
     postTaskDataToBackEnd(dataToSend);
     setTask(null);
+    setDate(new Date());
+    setDaily(false);
+    setSend(false);
   };
 
   const completeTask = (index) => {
@@ -118,7 +150,8 @@ const TaskScreen = () => {
             onConfirm={(date) => {
               setDate(date);
               setOpen(false);
-              sendTaskDataToBackend();
+              createTwoButtonAlert();
+              
             }}
             onCancel={() => {
               setOpen(false)
