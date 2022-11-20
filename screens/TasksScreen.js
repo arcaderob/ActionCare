@@ -14,6 +14,21 @@ const TaskScreen = () => {
   const [daily, setDaily] = useState(false);
   const [send, setSend] = useState(false);
 
+  const email = auth.currentUser.email;
+
+  useEffect(() => {
+    // fetch data
+    axios.get(`http://localhost:3001/tasks?email=${email}`)
+      .then(resp => {
+        const items = resp.data.map((item) => {
+          return item.task;
+        })
+        const taskData = [...taskItems, ...items];
+        setTaskItems(taskData);
+      })
+      .catch(e => console.error(e));
+  }, []);
+
   useEffect(() => {
     if (send) {
       sendTaskDataToBackend();
@@ -66,7 +81,7 @@ const TaskScreen = () => {
       })
       .catch(e => {
         console.error(e);
-      })
+      });
   };
 
   const handleSettingTaskData = () => {
@@ -77,7 +92,7 @@ const TaskScreen = () => {
   }
 
   const sendTaskDataToBackend = () => {
-    const dataToSend = { task, date, daily }
+    const dataToSend = { task, date, daily, email };
     postTaskDataToBackEnd(dataToSend);
     setTask(null);
     setDate(new Date());
@@ -90,6 +105,8 @@ const TaskScreen = () => {
     itemsCopy.splice(index, 1);
     setTaskItems(itemsCopy);
   }
+
+  const getEpochTime = () => new Date().getTime();
 
   return (
     <View style={styles.container}>
@@ -119,7 +136,7 @@ const TaskScreen = () => {
           {
             taskItems.map((item, index) => {
               return (
-                <TouchableOpacity key={index}  onPress={() => completeTask(index)}>
+                <TouchableOpacity key={index}  onPress={() => completeTask(index + getEpochTime())}>
                   <Task text={item} />
                 </TouchableOpacity>
               )
