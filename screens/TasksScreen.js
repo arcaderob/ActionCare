@@ -22,7 +22,7 @@ const TaskScreen = () => {
     axios.get(`http://localhost:3001/tasks?email=${email}`)
       .then(resp => {
         const items = resp.data.map((item) => {
-          return `${item.task} at ${getTimeFromDate(item.datetime)}`;
+          return `${item.task} at ${item.datetime}`;
         })
         const taskData = [...taskItems, ...items];
         setTaskItems(sortByTime(getUniqueSet(taskData)));
@@ -41,8 +41,8 @@ const TaskScreen = () => {
   const getUniqueSet = tasks => [...new Set(tasks)];
 
   const sortByTime = (a) => a.sort(function(x,y){
-    var xp = x.substring(x.lastIndexOf(' '))
-    var yp = y.substring(y.lastIndexOf(' '));
+    var xp = getTimeFromDate(x.substring(x.lastIndexOf(' ')));
+    var yp = getTimeFromDate(y.substring(y.lastIndexOf(' ')));
     return xp == yp ? 0 : xp < yp ? -1 : 1;
   });
 
@@ -93,6 +93,8 @@ const TaskScreen = () => {
       });
   };
 
+  const getTimeFromDate = (datetime) => dayjs(datetime).format('HH:mm');
+
   const handleSettingTaskData = () => {
     Keyboard.dismiss();
     const taskData = [...taskItems, task];
@@ -116,8 +118,6 @@ const TaskScreen = () => {
   }
 
   const getEpochTime = () => new Date().getTime();
-
-  const getTimeFromDate = (datetime) => dayjs(datetime).format('HH:mm');
 
   return (
     <View style={styles.container}>
@@ -179,7 +179,7 @@ const TaskScreen = () => {
               setDate(date);
               let lastTask = taskItems.pop();
               if (lastTask) {
-                lastTask = `${lastTask} at ${getTimeFromDate(date)}`;
+                lastTask = `${lastTask} at ${date}`;
                 setTaskItems(sortByTime([...taskItems, lastTask]));
               }
               setOpen(false);

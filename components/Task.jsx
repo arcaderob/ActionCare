@@ -1,14 +1,20 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import dayjs from 'dayjs';
+
+const getTimeFromDate = (datetime) => dayjs(datetime).format('HH:mm');
 
 const Task = (props) => {
+
+  const textParts = props.text.split(' ');
+  const time = getTimeFromDate(textParts.pop());
+  const formattedName = `${textParts.join(' ')} ${time}`;
 
   return (
     <View style={styles.item}>
       <View style={styles.itemLeft}>
         <View style={styles.square}></View>
-        <Text style={styles.itemText}>{props.text}</Text>
-        {/* {props.time ? <Text style={styles.time}>{props.time}</Text> : null} */}
+        <Text style={styles.itemText}>{formattedName}</Text>
       </View>
       <View style={styles.circular}></View>
     </View>
