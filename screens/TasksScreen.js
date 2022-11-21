@@ -111,13 +111,22 @@ const TaskScreen = () => {
     setSend(false);
   };
 
+  const completeTaskOnBackend = (item) => {
+    axios.post('http://localhost:3001/deleteTask', {item: item[0], email})
+      .then(resp => {
+        console.log('success', resp);
+      })
+      .catch(e => {
+        console.error(e);
+      })
+  };
+
   const completeTask = (index) => {
     let itemsCopy = [...taskItems];
-    itemsCopy.splice(index, 1);
+    const item = itemsCopy.splice(index, 1);
+    completeTaskOnBackend(item);
     setTaskItems(sortByTime(itemsCopy));
   }
-
-  const getEpochTime = () => new Date().getTime();
 
   return (
     <View style={styles.container}>
@@ -147,7 +156,7 @@ const TaskScreen = () => {
           {
             taskItems.map((item, index) => {
               return (
-                <TouchableOpacity key={index}  onPress={() => completeTask(index + getEpochTime())}>
+                <TouchableOpacity key={index}  onPress={() => completeTask(index)}>
                   <Task text={item} />
                 </TouchableOpacity>
               )
