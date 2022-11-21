@@ -5,6 +5,7 @@ import { auth } from '../firebase';
 import Task from '../components/Task';
 import axios from 'axios';
 import DatePicker from 'react-native-date-picker';
+import dayjs from 'dayjs';
 
 const TaskScreen = () => {
   const [task, setTask] = useState();
@@ -21,10 +22,10 @@ const TaskScreen = () => {
     axios.get(`http://localhost:3001/tasks?email=${email}`)
       .then(resp => {
         const items = resp.data.map((item) => {
-          return item.task;
+          return `${item.task} at ${getTimeFromDate(item.datetime)}`;
         })
         const taskData = [...taskItems, ...items];
-        setTaskItems(taskData);
+        setTaskItems(sortByTime(getUniqueSet(taskData)));
       })
       .catch(e => console.error(e));
   }, []);
@@ -35,7 +36,15 @@ const TaskScreen = () => {
     }
 }, [send]);
 
-  const navigation = useNavigation()
+  const navigation = useNavigation();
+
+  const getUniqueSet = tasks => [...new Set(tasks)];
+
+  const sortByTime = (a) => a.sort(function(x,y){
+    var xp = x.substring(x.lastIndexOf(' '))
+    var yp = y.substring(y.lastIndexOf(' '));
+    return xp == yp ? 0 : xp < yp ? -1 : 1;
+  });
 
   const handleLogout = () => {
     auth
@@ -87,7 +96,7 @@ const TaskScreen = () => {
   const handleSettingTaskData = () => {
     Keyboard.dismiss();
     const taskData = [...taskItems, task];
-    setTaskItems(taskData);
+    setTaskItems(sortByTime(taskData));
     setOpen(true);
   }
 
@@ -103,10 +112,12 @@ const TaskScreen = () => {
   const completeTask = (index) => {
     let itemsCopy = [...taskItems];
     itemsCopy.splice(index, 1);
-    setTaskItems(itemsCopy);
+    setTaskItems(sortByTime(itemsCopy));
   }
 
   const getEpochTime = () => new Date().getTime();
+
+  const getTimeFromDate = (datetime) => dayjs(datetime).format('HH:mm');
 
   return (
     <View style={styles.container}>
@@ -166,6 +177,11 @@ const TaskScreen = () => {
             date={date}
             onConfirm={(date) => {
               setDate(date);
+              let lastTask = taskItems.pop();
+              if (lastTask) {
+                lastTask = `${lastTask} at ${getTimeFromDate(date)}`;
+                setTaskItems(sortByTime([...taskItems, lastTask]));
+              }
               setOpen(false);
               createTwoButtonAlert();
               
