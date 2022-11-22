@@ -2,6 +2,7 @@ import { useNavigation } from '@react-navigation/core';
 import React, { useEffect, useState } from 'react';
 import { Alert, KeyboardAvoidingView, StyleSheet, Text, View, TextInput, TouchableOpacity, Keyboard, ScrollView } from 'react-native';
 import { auth, db } from '../firebase';
+import Subscriber from '../components/Subscriber';
 import axios from 'axios';
 
 const SubscribersScreen = () => {
