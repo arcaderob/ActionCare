@@ -17,7 +17,7 @@ const TaskScreen = () => {
   const [daily, setDaily] = useState(false);
   const [send, setSend] = useState(false);
   const [accountType, setAccountType] = useState();
-  const taskEmail = auth.currentUser.email;
+  const email = auth.currentUser.email;
 
   useEffect(() => {
     // get data
@@ -27,13 +27,13 @@ const TaskScreen = () => {
           setAccountType(accountType);
       });
 
-    // TODO: change taskEmail to it's patient
+    // TODO: change email to it's patient
     if (accountType == 'Subscriber')
     {
-      taskEmail = getPatientEmailBackend(taskEmail);
+      email = getPatientEmailBackend(email);
     }
 
-    axios.get(`http://localhost:3001/tasks?email=${taskEmail}`)
+    axios.get(`http://localhost:3001/tasks?email=${email}`)
       .then(resp => {
         const items = resp.data.map((item) => {
           return `${item.task} at ${item.datetime}`;
@@ -124,7 +124,7 @@ const TaskScreen = () => {
   };
 
   const sendTaskDataToBackend = () => {
-    const dataToSend = { task, date, daily, taskEmail };
+    const dataToSend = { task, date, daily, email };
     postTaskDataToBackEnd(dataToSend);
     setTask(null);
     setDate(new Date());
@@ -133,7 +133,7 @@ const TaskScreen = () => {
   };
 
   const completeTaskOnBackend = (item) => {
-    axios.post('http://localhost:3001/deleteTask', {item: item[0], taskEmail, deleteTime: new Date()})
+    axios.post('http://localhost:3001/deleteTask', {item: item[0], email, deleteTime: new Date()})
       .then(resp => {
         console.log('success', resp);
       })
