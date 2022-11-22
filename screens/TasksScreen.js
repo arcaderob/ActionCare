@@ -112,7 +112,7 @@ const TaskScreen = () => {
   };
 
   const completeTaskOnBackend = (item) => {
-    axios.post('http://localhost:3001/deleteTask', {item: item[0], email})
+    axios.post('http://localhost:3001/deleteTask', {item: item[0], email, deleteTime: new Date()})
       .then(resp => {
         console.log('success', resp);
       })
