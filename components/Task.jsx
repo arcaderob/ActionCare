@@ -6,9 +6,13 @@ const getTimeFromDate = (datetime) => dayjs(datetime).format('HH:mm');
 
 const Task = (props) => {
 
-  const textParts = props.text.split(' ');
-  const time = getTimeFromDate(textParts.pop());
-  const formattedName = `${textParts.join(' ')} ${time}`;
+  let formattedName = props.text;
+
+  if (formattedName.indexOf('at') !== -1) {
+    const textParts = props.text.split(' ');
+    const time = getTimeFromDate(textParts.pop());
+    formattedName = `${textParts.join(' ')} ${time}`;
+  }
 
   return (
     <View style={styles.item}>

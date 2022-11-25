@@ -98,7 +98,7 @@ const TaskScreen = () => {
   const handleSettingTaskData = () => {
     Keyboard.dismiss();
     const taskData = [...taskItems, task];
-    setTaskItems(sortByTime(taskData));
+    setTaskItems(taskData);
     setOpen(true);
   }
 
@@ -184,12 +184,13 @@ const TaskScreen = () => {
             modal
             open={open}
             date={date}
-            onConfirm={(date) => {
-              setDate(date);
+            onConfirm={(pickerDate) => {
+              const formatedDate = dayjs(pickerDate).format('YYYY-MM-DDTHH:mm:ss.000[Z]');
+              setDate(new Date(formatedDate));
               let lastTask = taskItems.pop();
               if (lastTask) {
-                lastTask = `${lastTask} at ${date}`;
-                setTaskItems(sortByTime([...taskItems, lastTask]));
+                lastTask = `${lastTask} at ${formatedDate}`;
+                setTaskItems([...taskItems, lastTask]);
               }
               setOpen(false);
               createTwoButtonAlert();
