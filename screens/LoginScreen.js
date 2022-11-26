@@ -52,7 +52,6 @@ const LoginScreen = () => {
       .signInWithEmailAndPassword(email, password)
       .then(userCredentials => {
         const user = userCredentials.user;
-        console.log('this is the data after login', userCredentials);
         Alert.alert(
           "Success",
           `Logged in as ${user.email}`,
