@@ -11,8 +11,18 @@ const SubscribersScreen = () => {
   const [subscriber, setSubscriber] = useState();
   const [subscriberItems, setSubscriberItems] = useState([]);
 
-  useEffect(() => {
+  const email = auth.currentUser.email;
 
+  useEffect(() => {
+    axios.get(`http://localhost:3001/subscribers?email=${email}`)
+      .then(resp => {
+        let subscriberData = [...subscriberItems];
+        resp.data.forEach((item) => {
+          subscriberData = [...subscriberData, item.subscriberEmail];
+        });
+        setSubscriberItems(subscriberData);
+      })
+      .catch(e => console.error(e));
   }, []);
 
   const handleLogout = () => {
