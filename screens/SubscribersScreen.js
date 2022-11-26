@@ -45,9 +45,17 @@ const SubscribersScreen = () => {
         navigation.replace("Tasks");
     };
 
-    // TODO
-    const deleteSubscriptionOnBackend = (item) => {
-
+    const deleteSubscriptionOnBackend = (data) => {
+      axios.post('http://localhost:3001/deleteSubscriber', {
+        patient: email,
+        subscriber: data[0]
+      })
+        .then(resp => {
+          console.log('succcess', resp);
+        })
+        .catch(e => {
+          console.error(e);
+        });
     };
 
     const deleteSubscriber = (index) => {
@@ -59,12 +67,12 @@ const SubscribersScreen = () => {
 
     const addSubscriptionOnBackend = (data) => {
       axios.post('http://localhost:3001/subscriber', {data})
-      .then(resp => {
-        console.log('succcess', resp);
-      })
-      .catch(e => {
-        console.error(e);
-      });
+        .then(resp => {
+          console.log('succcess', resp);
+        })
+        .catch(e => {
+          console.error(e);
+        });
     };
 
     const handleSettingSubscriberData = () => {
