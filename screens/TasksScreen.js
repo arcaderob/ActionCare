@@ -19,6 +19,8 @@ const TaskScreen = () => {
   const [accountType, setAccountType] = useState();
   const email = auth.currentUser.email;
 
+  const DEBUG_USER_TYPE = 'patient';
+
   useEffect(() => {
     // get data
     db.collection('users').doc(auth.currentUser.uid)
@@ -119,7 +121,7 @@ const TaskScreen = () => {
   const handleSettingTaskData = () => {
     Keyboard.dismiss();
     const taskData = [...taskItems, task];
-    setTaskItems(sortByTime(taskData));
+    setTaskItems(taskData);
     setOpen(true);
   };
 
