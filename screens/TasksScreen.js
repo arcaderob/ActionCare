@@ -17,9 +17,8 @@ const TaskScreen = () => {
   const [daily, setDaily] = useState(false);
   const [send, setSend] = useState(false);
   const [accountType, setAccountType] = useState();
+  
   const email = auth.currentUser.email;
-
-  const DEBUG_USER_TYPE = 'patient';
 
   useEffect(() => {
     // get data

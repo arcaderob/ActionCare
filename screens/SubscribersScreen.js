@@ -47,20 +47,28 @@ const SubscribersScreen = () => {
       setSubscriberItems(itemsCopy);
     };
 
-    // TODO
-    const addSubscriptionOnBackend = (item) => {
-
+    const addSubscriptionOnBackend = (data) => {
+      axios.post('http://localhost:3001/subscriber', {data})
+      .then(resp => {
+        console.log('succcess', resp);
+      })
+      .catch(e => {
+        console.error(e);
+      });
     };
 
     const handleSettingSubscriberData = () => {
       Keyboard.dismiss();
 
       // Check if user exists
-      firebase.auth().fetchProvidersForEmail(email)
+      auth.fetchSignInMethodsForEmail(subscriber)
         .then(providers => {
           if (providers.length != 0) {
             const subscriberData = [...subscriberItems, subscriber];
-            addSubscriptionOnBackend(item);
+            addSubscriptionOnBackend({
+              patient: auth.currentUser.email,
+              subscriber
+            });
             setSubscriberItems(subscriberData);
             setSubscriber(null);
           }
@@ -71,7 +79,8 @@ const SubscribersScreen = () => {
               [{ text: "OK", onPress: () => {} }]
             );
           }
-      });
+      })
+      .catch((e) => console.error(e));
     };
 
   return (
@@ -126,7 +135,11 @@ const SubscribersScreen = () => {
       >
         <TextInput style={styles.input} placeholder={'Add a subscriber by email'} value={subscriber} onChangeText={text => setSubscriber(text)} />
         <TouchableOpacity onPress={() => {
-          handleSettingSubscriberData();
+          if (!subscriber) {
+            Alert.alert('Error', 'Please enter an email address');
+          } else {
+            handleSettingSubscriberData();
+          }
         }}>
           <View style={styles.addWrapper}>
             <Text style={styles.addText}>+</Text>
