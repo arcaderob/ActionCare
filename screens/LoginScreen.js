@@ -33,7 +33,7 @@ const LoginScreen = () => {
     await auth
       .createUserWithEmailAndPassword(email, password)
       .then(userCredentials => {
-        db.collection('users').doc(userCredentials.user.uid).set({ accountType: accountType });
+        db.collection('users').doc(userCredentials.user.uid).set({ accountType: accountType }, { merge: true });
         const user = userCredentials.user;
         console.log(`Success: Signed up as ${user.email}`);
       })
@@ -52,6 +52,7 @@ const LoginScreen = () => {
       .signInWithEmailAndPassword(email, password)
       .then(userCredentials => {
         const user = userCredentials.user;
+        console.log('this is the data after login', userCredentials);
         Alert.alert(
           "Success",
           `Logged in as ${user.email}`,

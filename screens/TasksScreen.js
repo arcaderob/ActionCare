@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/core';
 import React, { useEffect, useState } from 'react';
 import { Alert, KeyboardAvoidingView, StyleSheet, Text, View, TextInput, TouchableOpacity, Keyboard, ScrollView } from 'react-native';
-import { auth } from '../firebase';
+import { auth, db } from '../firebase';
 import Task from '../components/Task';
 import axios from 'axios';
 import DatePicker from 'react-native-date-picker';
@@ -16,6 +16,8 @@ const TaskScreen = () => {
   const [send, setSend] = useState(false);
 
   const email = auth.currentUser.email;
+
+  const DEBUG_USER_TYPE = 'patient';
 
   useEffect(() => {
     // fetch data
@@ -169,7 +171,7 @@ const TaskScreen = () => {
 
       {/* Write a task */}
       {/* Uses a keyboard avoiding view which ensures the keyboard does not cover the items on screen */}
-      <KeyboardAvoidingView
+      {DEBUG_USER_TYPE === 'patient' ? <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.writeTaskWrapper}
       >
@@ -205,7 +207,7 @@ const TaskScreen = () => {
             }}
           />
         </TouchableOpacity>
-      </KeyboardAvoidingView>
+      </KeyboardAvoidingView> : null}
     </View>
   );
 }
