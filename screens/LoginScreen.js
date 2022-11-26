@@ -30,10 +30,13 @@ const LoginScreen = () => {
       ],
       { cancelable: false }
     );
+
     await auth
       .createUserWithEmailAndPassword(email, password)
       .then(userCredentials => {
-        db.collection('users').doc(userCredentials.user.uid).set({ accountType: accountType }, { merge: true });
+        db.collection('users').doc(userCredentials.user.uid).set({
+          accountType: accountType
+        });
         const user = userCredentials.user;
         console.log(`Success: Signed up as ${user.email}`);
       })

@@ -8,19 +8,33 @@ import DatePicker from 'react-native-date-picker';
 import dayjs from 'dayjs';
 
 const TaskScreen = () => {
+  const navigation = useNavigation();
+
   const [task, setTask] = useState();
   const [taskItems, setTaskItems] = useState([]);
   const [date, setDate] = useState(new Date())
   const [open, setOpen] = useState(false)
   const [daily, setDaily] = useState(false);
   const [send, setSend] = useState(false);
-
+  const [accountType, setAccountType] = useState();
   const email = auth.currentUser.email;
 
   const DEBUG_USER_TYPE = 'patient';
 
   useEffect(() => {
-    // fetch data
+    // get data
+    db.collection('users').doc(auth.currentUser.uid)
+      .get().then((ds) => {
+          const accountType = ds.data().accountType;
+          setAccountType(accountType);
+      });
+
+    // TODO: change email to it's patient
+    if (accountType == 'Subscriber')
+    {
+      email = getPatientEmailBackend(email);
+    }
+
     axios.get(`http://localhost:3001/tasks?email=${email}`)
       .then(resp => {
         const items = resp.data.map((item) => {
@@ -36,9 +50,7 @@ const TaskScreen = () => {
     if (send) {
       sendTaskDataToBackend();
     }
-}, [send]);
-
-  const navigation = useNavigation();
+  }, [send]);
 
   const getUniqueSet = tasks => [...new Set(tasks)];
 
@@ -47,6 +59,11 @@ const TaskScreen = () => {
     var yp = getTimeFromDate(y.substring(y.lastIndexOf(' ')));
     return xp == yp ? 0 : xp < yp ? -1 : 1;
   });
+
+  // TODO
+  const getPatientEmailBackend = (subscriberEmail) => {
+
+  };
 
   const handleLogout = () => {
     auth
@@ -62,7 +79,11 @@ const TaskScreen = () => {
         );
         console.log(`Error: ${error.message}`);
       });
-  }
+  };
+
+  const handleSubscribers = () => {
+      navigation.replace("Subscribers");
+  };
 
   const createTwoButtonAlert = () =>
     Alert.alert(
@@ -102,7 +123,7 @@ const TaskScreen = () => {
     const taskData = [...taskItems, task];
     setTaskItems(taskData);
     setOpen(true);
-  }
+  };
 
   const sendTaskDataToBackend = () => {
     const dataToSend = { task, date, daily, email };
@@ -124,11 +145,14 @@ const TaskScreen = () => {
   };
 
   const completeTask = (index) => {
-    let itemsCopy = [...taskItems];
-    const item = itemsCopy.splice(index, 1);
-    completeTaskOnBackend(item);
-    setTaskItems(sortByTime(itemsCopy));
-  }
+    if (accountType == "Patient")
+    {
+      let itemsCopy = [...taskItems];
+      const item = itemsCopy.splice(index, 1);
+      completeTaskOnBackend(item);
+      setTaskItems(sortByTime(itemsCopy));
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -140,7 +164,7 @@ const TaskScreen = () => {
         keyboardShouldPersistTaps='handled'
       >
 
-      {/*Logout Button*/}
+      {/*Logout and Subscribers Button*/}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           onPress={handleLogout}
@@ -148,6 +172,14 @@ const TaskScreen = () => {
         >
           <Text style={styles.buttonText}>Logout</Text>
         </TouchableOpacity>
+        { accountType == "Patient" ?
+          <TouchableOpacity
+            onPress={handleSubscribers}
+            style={styles.button}
+          >
+            <Text style={styles.buttonText}>Subscribers</Text>
+          </TouchableOpacity> : null
+        }
       </View>
 
       {/* Today's Tasks */}
@@ -171,43 +203,40 @@ const TaskScreen = () => {
 
       {/* Write a task */}
       {/* Uses a keyboard avoiding view which ensures the keyboard does not cover the items on screen */}
-      {DEBUG_USER_TYPE === 'patient' ? <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.writeTaskWrapper}
-      >
-        <TextInput style={styles.input} placeholder={'Write a task'} value={task} onChangeText={text => setTask(text)} />
-        <TouchableOpacity onPress={() => {
-          if (!task) {
-            Alert.alert('Error', 'Please enter a task title');
-          } else {
+      { accountType == "Patient" ?
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.writeTaskWrapper}
+        >
+          <TextInput style={styles.input} placeholder={'Write a task'} value={task} onChangeText={text => setTask(text)} />
+          <TouchableOpacity onPress={() => {
             handleSettingTaskData();
-          }
-        }}>
-          <View style={styles.addWrapper}>
-            <Text style={styles.addText}>+</Text>
-          </View>
-          <DatePicker
-            modal
-            open={open}
-            date={date}
-            onConfirm={(pickerDate) => {
-              const formatedDate = dayjs(pickerDate).format('YYYY-MM-DDTHH:mm:ss.000[Z]');
-              setDate(new Date(formatedDate));
-              let lastTask = taskItems.pop();
-              if (lastTask) {
-                lastTask = `${lastTask} at ${formatedDate}`;
-                setTaskItems([...taskItems, lastTask]);
-              }
-              setOpen(false);
-              createTwoButtonAlert();
-              
-            }}
-            onCancel={() => {
-              setOpen(false)
-            }}
-          />
-        </TouchableOpacity>
-      </KeyboardAvoidingView> : null}
+          }}>
+            <View style={styles.addWrapper}>
+              <Text style={styles.addText}>+</Text>
+            </View>
+            <DatePicker
+              modal
+              open={open}
+              date={date}
+              onConfirm={(date) => {
+                setDate(date);
+                let lastTask = taskItems.pop();
+                if (lastTask) {
+                  lastTask = `${lastTask} at ${date}`;
+                  setTaskItems(sortByTime([...taskItems, lastTask]));
+                }
+                setOpen(false);
+                createTwoButtonAlert();
+
+              }}
+              onCancel={() => {
+                setOpen(false)
+              }}
+            />
+          </TouchableOpacity>
+        </KeyboardAvoidingView> : null
+      }
     </View>
   );
 }
@@ -231,24 +260,25 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   buttonContainer: {
-    width: '30%',
     flexDirection: "row",
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
     marginTop: 30,
+    paddingHorizontal: 20
   },
   button: {
     backgroundColor: '#55BCF6',
-    width: '100%',
+    width: '35%',
     height: '100%',
     padding: 10,
+    marginRight: 10,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: 'center'
   },
   buttonText: {
     color: 'white',
     fontWeight: '700',
-    fontSize: 16,
+    fontSize: 16
   },
   writeTaskWrapper: {
     position: 'absolute',
@@ -265,7 +295,7 @@ const styles = StyleSheet.create({
     borderRadius: 60,
     borderColor: '#C0C0C0',
     borderWidth: 1,
-    width: 250,
+    width: 250
   },
   addWrapper: {
     width: 60,
@@ -275,7 +305,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderColor: '#C0C0C0',
-    borderWidth: 1,
+    borderWidth: 1
   },
   addText: {},
 });
