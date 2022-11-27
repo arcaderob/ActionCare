@@ -34,7 +34,7 @@ const TaskScreen = () => {
       email = getPatientEmailBackend(email);
     }
 
-    axios.get(`http://localhost:3001/tasks?email=${email}`)
+    axios.get(`https://e253-142-134-243-111.ngrok.io/tasks?email=${email}`)
       .then(resp => {
         const items = resp.data.map((item) => {
           return `${item.task} at ${item.datetime}`;
@@ -106,7 +106,7 @@ const TaskScreen = () => {
     );
 
   const postTaskDataToBackEnd = (taskData) => {
-    axios.post('http://localhost:3001/task', {taskData})
+    axios.post('https://e253-142-134-243-111.ngrok.io/task', {taskData})
       .then(resp => {
         console.log('succcess', resp);
       })
@@ -134,7 +134,7 @@ const TaskScreen = () => {
   };
 
   const completeTaskOnBackend = (item) => {
-    axios.post('http://localhost:3001/deleteTask', {item: item[0], email, deleteTime: new Date()})
+    axios.post('https://e253-142-134-243-111.ngrok.io/deleteTask', {item: item[0], email, deleteTime: new Date()})
       .then(resp => {
         console.log('success', resp);
       })

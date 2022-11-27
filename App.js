@@ -10,7 +10,7 @@ import SubscribersScreen from './screens/SubscribersScreen';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-  registerNNPushToken(5024, 'V52zpwBsjIZRO8ollX2o53');
+  registerNNPushToken(5033, 'iCsXYfWlLbPcCl9Dr0P1H9');
 
   return (
     <NavigationContainer>

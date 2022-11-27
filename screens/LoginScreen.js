@@ -3,8 +3,9 @@ import React, { useEffect, useState } from 'react';
 import { Alert, TouchableOpacity, TextInput, KeyboardAvoidingView, StyleSheet, Text, View } from 'react-native';
 import AlertAsync from "react-native-alert-async";
 import { auth, db } from '../firebase';
+import { registerIndieID } from 'native-notify';
 
-const LoginScreen = () => {
+export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -53,7 +54,9 @@ const LoginScreen = () => {
   const handleLogin = () => {
     auth
       .signInWithEmailAndPassword(email, password)
-      .then(userCredentials => {
+      .then(async userCredentials => {
+        await registerIndieID(email, 5033, 'iCsXYfWlLbPcCl9Dr0P1H9');
+
         const user = userCredentials.user;
         Alert.alert(
           "Success",
@@ -81,8 +84,9 @@ const LoginScreen = () => {
         <TextInput
           placeholder="Email"
           value={email}
-          onChangeText={text => setEmail(text)}
+          onChangeText={text => setEmail(text.toLowerCase())}
           style={styles.input}
+          autoCapitalize="none"
         />
         <TextInput
           placeholder="Password"
@@ -110,8 +114,6 @@ const LoginScreen = () => {
     </KeyboardAvoidingView>
   );
 }
-
-export default LoginScreen;
 
 const styles = StyleSheet.create({
    container: {

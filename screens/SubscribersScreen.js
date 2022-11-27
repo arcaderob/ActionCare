@@ -14,7 +14,7 @@ const SubscribersScreen = () => {
   const email = auth.currentUser.email;
 
   useEffect(() => {
-    axios.get(`http://localhost:3001/subscribers?email=${email}`)
+    axios.get(`https://e253-142-134-243-111.ngrok.io/subscribers?email=${email}`)
       .then(resp => {
         let subscriberData = [...subscriberItems];
         resp.data.forEach((item) => {
@@ -46,7 +46,7 @@ const SubscribersScreen = () => {
     };
 
     const deleteSubscriptionOnBackend = (data) => {
-      axios.post('http://localhost:3001/deleteSubscriber', {
+      axios.post('https://e253-142-134-243-111.ngrok.io/deleteSubscriber', {
         patient: email,
         subscriber: data[0]
       })
@@ -66,7 +66,7 @@ const SubscribersScreen = () => {
     };
 
     const addSubscriptionOnBackend = (data) => {
-      axios.post('http://localhost:3001/subscriber', {data})
+      axios.post('https://e253-142-134-243-111.ngrok.io/subscriber', {data})
         .then(resp => {
           console.log('succcess', resp);
         })
@@ -151,7 +151,7 @@ const SubscribersScreen = () => {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.addSubscriberWrapper}
       >
-        <TextInput style={styles.input} placeholder={'Add a subscriber by email'} value={subscriber} onChangeText={text => setSubscriber(text)} />
+        <TextInput style={styles.input} placeholder={'Add a subscriber by email'} autoCapitalize='none' value={subscriber} onChangeText={text => setSubscriber(text.toLowerCase())} />
         <TouchableOpacity onPress={() => {
           if (!subscriber) {
             Alert.alert('Error', 'Please enter an email address');
