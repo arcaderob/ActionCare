@@ -21,20 +21,15 @@ const TaskScreen = () => {
   const email = auth.currentUser.email;
 
   useEffect(() => {
-    // get data
     db.collection('users').doc(auth.currentUser.uid)
       .get().then((ds) => {
-          const accountType = ds.data().accountType;
-          setAccountType(accountType);
+          const type = ds.data().accountType;
+          setAccountType(type);
       });
+  }, []);
 
-    // TODO: change email to it's patient
-    if (accountType == 'Subscriber')
-    {
-      email = getPatientEmailBackend(email);
-    }
-
-    axios.get(`https://e253-142-134-243-111.ngrok.io/tasks?email=${email}`)
+  useEffect(() => {
+    axios.get(`https://e253-142-134-243-111.ngrok.io/${accountType === 'Subscriber' ? 'subTasks' : 'tasks' }?email=${email}`)
       .then(resp => {
         const items = resp.data.map((item) => {
           return `${item.task} at ${item.datetime}`;
@@ -43,7 +38,7 @@ const TaskScreen = () => {
         setTaskItems(sortByTime(getUniqueSet(taskData)));
       })
       .catch(e => console.error(e));
-  }, []);
+  }, [accountType]);
 
   useEffect(() => {
     if (send) {
@@ -54,8 +49,8 @@ const TaskScreen = () => {
   const getUniqueSet = tasks => [...new Set(tasks)];
 
   const sortByTime = (a) => a.sort(function(x,y){
-    var xp = getTimeFromDate(x.substring(x.lastIndexOf(' ')));
-    var yp = getTimeFromDate(y.substring(y.lastIndexOf(' ')));
+    var xp = getTimeFromDate(x.substring(x.lastIndexOf(' ')).trim());
+    var yp = getTimeFromDate(y.substring(y.lastIndexOf(' ')).trim());
     return xp == yp ? 0 : xp < yp ? -1 : 1;
   });
 
@@ -120,7 +115,7 @@ const TaskScreen = () => {
   const handleSettingTaskData = () => {
     Keyboard.dismiss();
     const taskData = [...taskItems, task];
-    setTaskItems(taskData);
+    setTaskItems(sortByTime(taskData));
     setOpen(true);
   };
 
