@@ -80,6 +80,7 @@ export default function LoginScreen() {
       style={styles.container}
       behaviour="padding"
     >
+      <Text style={styles.header}>ActionCare</Text>
       <View style={styles.inputContainer}>
         <TextInput
           placeholder="Email"
@@ -162,4 +163,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 16,
    },
+   header: {
+    fontSize: 32
+   }
 });
