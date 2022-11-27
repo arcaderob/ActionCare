@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import registerNNPushToken from 'native-notify';
 import LoginScreen from './screens/LoginScreen';
 import TasksScreen from './screens/TasksScreen';
 import SubscribersScreen from './screens/SubscribersScreen';
@@ -9,6 +10,8 @@ import SubscribersScreen from './screens/SubscribersScreen';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  registerNNPushToken(5024, 'V52zpwBsjIZRO8ollX2o53');
+
   return (
     <NavigationContainer>
       <Stack.Navigator>

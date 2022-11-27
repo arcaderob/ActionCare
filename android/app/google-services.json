@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "78033086337",
+    "project_id": "actioncare-72057",
+    "storage_bucket": "actioncare-72057.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:78033086337:android:7a49b72d99631620256a80",
+        "android_client_info": {
+          "package_name": "com.anonymous.ActionCare"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "78033086337-h9mg30q4h1k5o2k4p17j5ejptauakbk7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPOSHTAQg7fFaB7k3Y44kwxoEK3N1N6lQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "78033086337-h9mg30q4h1k5o2k4p17j5ejptauakbk7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
