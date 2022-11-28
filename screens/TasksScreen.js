@@ -32,6 +32,7 @@ const TaskScreen = () => {
     axios.get(`https://e253-142-134-243-111.ngrok.io/${accountType === 'Subscriber' ? 'subTasks' : 'tasks' }?email=${email}`)
       .then(resp => {
         const items = resp.data.map((item) => {
+          console.log('this is the thing', item.datetime);
           return `${item.task} at ${item.datetime}`;
         })
         const taskData = [...taskItems, ...items];
@@ -54,7 +55,8 @@ const TaskScreen = () => {
     return xp == yp ? 0 : xp < yp ? -1 : 1;
   });
 
-  const formatDatetime = (val) => dayjs(val).format('YYYY-MM-DDTHH:mm:ss.000[Z]')
+  const getTimeFromDate = (datetime) => dayjs(datetime).format('HH:mm');
+  const formatDatetime = (val) => dayjs(val).format('YYYY-MM-DDTHH:mm:ss')
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -68,8 +70,6 @@ const TaskScreen = () => {
     const formatedDatetime = formatDatetime(datedata)
     setDate(formatedDatetime);
     let lastTask = taskItems.pop();
-    console.log('this is the lastTask', lastTask);
-    console.log('this is the datedata', formatedDatetime);
     if (lastTask) {
       lastTask = `${lastTask} at ${formatedDatetime}`;
       setTaskItems(sortByTime([...taskItems, lastTask]));
@@ -128,8 +128,6 @@ const TaskScreen = () => {
         console.error(e);
       });
   };
-
-  const getTimeFromDate = (datetime) => dayjs(datetime).format('HH:mm');
 
   const handleSettingTaskData = () => {
     Keyboard.dismiss();
