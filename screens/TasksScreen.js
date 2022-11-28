@@ -204,6 +204,11 @@ const TaskScreen = () => {
         >
           <TextInput style={styles.input} placeholder={'Write a task'} value={task} onChangeText={text => setTask(text)} />
           <TouchableOpacity onPress={() => {
+            if (!task) {
+              Alert.alert('Error', 'Please enter a task title');
+              return;
+            }
+
             handleSettingTaskData();
           }}>
             <View style={styles.addWrapper}>
