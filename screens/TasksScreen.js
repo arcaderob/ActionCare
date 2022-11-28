@@ -3,8 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { Alert, KeyboardAvoidingView, StyleSheet, Text, View, TextInput, TouchableOpacity, Keyboard, ScrollView } from 'react-native';
 import { auth, db } from '../firebase';
 import Task from '../components/Task';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 import axios from 'axios';
-import DatePicker from 'react-native-date-picker';
 import dayjs from 'dayjs';
 
 const TaskScreen = () => {
@@ -13,7 +13,7 @@ const TaskScreen = () => {
   const [task, setTask] = useState();
   const [taskItems, setTaskItems] = useState([]);
   const [date, setDate] = useState(new Date())
-  const [open, setOpen] = useState(false)
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [daily, setDaily] = useState(false);
   const [send, setSend] = useState(false);
   const [accountType, setAccountType] = useState();
@@ -54,9 +54,28 @@ const TaskScreen = () => {
     return xp == yp ? 0 : xp < yp ? -1 : 1;
   });
 
-  // TODO
-  const getPatientEmailBackend = (subscriberEmail) => {
+  const formatDatetime = (val) => dayjs(val).format('YYYY-MM-DDTHH:mm:ss.000[Z]')
 
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirm = (datedata) => {
+    const formatedDatetime = formatDatetime(datedata)
+    setDate(formatedDatetime);
+    let lastTask = taskItems.pop();
+    console.log('this is the lastTask', lastTask);
+    console.log('this is the datedata', formatedDatetime);
+    if (lastTask) {
+      lastTask = `${lastTask} at ${formatedDatetime}`;
+      setTaskItems(sortByTime([...taskItems, lastTask]));
+    }
+    createTwoButtonAlert();
+    hideDatePicker();
   };
 
   const handleLogout = () => {
@@ -116,7 +135,6 @@ const TaskScreen = () => {
     Keyboard.dismiss();
     const taskData = [...taskItems, task];
     setTaskItems(sortByTime(taskData));
-    setOpen(true);
   };
 
   const sendTaskDataToBackend = () => {
@@ -210,28 +228,17 @@ const TaskScreen = () => {
             }
 
             handleSettingTaskData();
+
+            showDatePicker();
           }}>
             <View style={styles.addWrapper}>
               <Text style={styles.addText}>+</Text>
             </View>
-            <DatePicker
-              modal
-              open={open}
-              date={date}
-              onConfirm={(date) => {
-                setDate(date);
-                let lastTask = taskItems.pop();
-                if (lastTask) {
-                  lastTask = `${lastTask} at ${date}`;
-                  setTaskItems(sortByTime([...taskItems, lastTask]));
-                }
-                setOpen(false);
-                createTwoButtonAlert();
-
-              }}
-              onCancel={() => {
-                setOpen(false)
-              }}
+            <DateTimePickerModal
+              isVisible={isDatePickerVisible}
+              mode="datetime"
+              onConfirm={handleConfirm}
+              onCancel={hideDatePicker}
             />
           </TouchableOpacity>
         </KeyboardAvoidingView> : null
